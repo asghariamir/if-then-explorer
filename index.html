@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>If-Then – Conditional Statements & Venn Diagrams</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- MathJax for beautiful math typesetting -->
+    <script>
+        // MathJax configuration to handle dynamic content
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          },
+          svg: {
+            fontCache: 'global'
+          },
+          startup: {
+            ready: () => {
+              console.log('MathJax is ready!');
+              window.MathJax.startup.defaultReady();
+            }
+          }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --primary-color: #1565c0; /* Blue */
+            --primary-light: #e3f2fd;
+            --primary-dark: #0d47a1;
+            --secondary-color: #c62828; /* Red for highlights */
+            --highlight-color: #ff8f00;
+            --success-color: #2e7d32;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #424242;
+            --text-color: #212121;
+            --bg-color: #fafafa;
+            --card-color: #ffffff;
+        }
+
+        /* --- Global Styles & Structure --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; justify-content: center; padding: 1rem;
+        }
+        .container {
+            width: 100%; max-width: 800px; margin: 1rem auto; background-color: var(--card-color);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08); border: 1px solid var(--medium-gray); border-radius: 12px; padding: 2rem;
+        }
+        h1 { font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem; text-align: center; }
+        h2 { font-size: 1.5rem; color: var(--dark-gray); margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 2px solid var(--medium-gray); padding-bottom: 0.5rem;}
+        h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 1rem; }
+
+        /* --- Tabs --- */
+        .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--medium-gray); justify-content: center; }
+        .tab {
+            padding: 0.75rem 1.5rem; background: none; border: none; cursor: pointer; font-size: 1.1rem;
+            color: var(--dark-gray); transition: all 0.3s ease; border-bottom: 4px solid transparent; transform: translateY(2px);
+        }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- Intro Tab --- */
+        .intro-container { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem;}
+        .intro-text { max-width: 600px; font-size: 1.1rem; line-height: 1.7; }
+        .intro-venn { border: 2px solid var(--medium-gray); border-radius: 8px; background-color: #fdfdfd; padding: 1rem;}
+
+        /* --- Logic Lab & Analysis Lab --- */
+        .lab-intro-box {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+        .lab-intro-box p { margin-bottom: 0.5rem; }
+        .lab-intro-box ul { list-style-position: inside; padding-left: 0.5rem; }
+        .ai-disclaimer {
+            font-size: 0.85rem; font-style: italic; color: var(--dark-gray);
+            margin-top: 1rem; border-top: 1px solid var(--medium-gray); padding-top: 0.5rem;
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+        }
+        @media (min-width: 600px) {
+            .controls-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .generate-button-container {
+                grid-column: 1 / -1; /* Span both columns */
+            }
+        }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .control-group label { font-weight: bold; color: var(--dark-gray); }
+        .control-group select, .control-group button, .control-group input, .control-group textarea {
+            padding: 0.75rem; border: 2px solid var(--medium-gray);
+            border-radius: 6px; font-size: 1rem; background-color: white;
+        }
+        .control-group button {
+            background-color: var(--primary-color); color: white; font-weight: bold;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .control-group button:hover { background-color: #1976d2; }
+        .control-group button:disabled { background-color: #9e9e9e; cursor: not-allowed; }
+        .challenge-btn {
+            background-color: transparent; color: var(--highlight-color); border-color: var(--highlight-color);
+            font-weight: bold; margin-top: 1rem;
+        }
+        .challenge-btn:hover { background-color: #fff3e0; }
+
+        /* --- Interactive Venn Diagram --- */
+        .interactive-area { text-align: center; }
+        #statement-display, #analysis-statement-display {
+            background-color: var(--primary-light); border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem; margin-bottom: 1.5rem; border-radius: 8px;
+            font-size: 1.1rem; min-height: 50px;
+        }
+        .venn-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto; }
+        .venn-box {
+            width: 100%; max-width: 400px; height: 400px; margin: 0 auto;
+            border-radius: 8px; background: white; overflow: hidden;
+        }
+        .venn-box.locked { cursor: default; filter: grayscale(0.7) brightness(0.95); }
+        .fail-region { cursor: pointer; opacity: 0; pointer-events: all; transition: opacity 0.15s; }
+        .fail-region.visible { opacity: 1; }
+        #venn-tooltip {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.75); color: white; padding: 0.5rem 1rem;
+            border-radius: 6px; font-size: 0.9rem; pointer-events: none; opacity: 0;
+            transition: opacity 0.2s; text-align: center; width: 220px;
+        }
+        #venn-tooltip.visible { opacity: 1; }
+        .venn-legend {
+            margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--medium-gray);
+            border-radius: 8px; background-color: var(--light-gray);
+        }
+        .legend-item { display: flex; align-items: flex-start; gap: 1rem; }
+        .legend-item:not(:last-child) { margin-bottom: 0.75rem; }
+        .legend-key {
+            flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: var(--primary-dark); border: 2px solid var(--primary-dark);
+        }
+        .legend-key.p-key { background-color: rgba(21,101,192,0.2); }
+        .legend-key.q-key { background-color: rgba(21,101,192,0.1); }
+
+        /* --- Feedback & Forms --- */
+        .feedback-box {
+            margin: 1.5rem auto; padding: 1.5rem; border-radius: 8px;
+            border: 1px solid var(--medium-gray); max-width: 500px;
+            text-align: center; font-size: 1.05rem;
+        }
+        .form-section { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .truth-radios { display: flex; gap: 1.5rem; }
+        #info-card {
+            margin-top: 1.5rem; padding: 1rem; border: 2px solid transparent;
+            border-radius: 8px; text-align: left;
+        }
+        #info-card.success { border-color: var(--success-color); background-color: #e8f5e9; }
+        #info-card.error { border-color: var(--secondary-color); background-color: #ffebee; }
+        .hidden { display: none; }
+        
+        /* --- Analysis Tab --- */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 700px) {
+            .analysis-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .analysis-card {
+            background-color: #fff;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .analysis-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        .analysis-card .form {
+            font-style: italic;
+            color: var(--dark-gray);
+            margin-bottom: 1rem;
+        }
+        .truth-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+        .truth-badge.true { background-color: var(--success-color); color: white; }
+        .truth-badge.false { background-color: var(--secondary-color); color: white; }
+        .analysis-text p { margin-bottom: 0.5rem; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>If-Then: A Logic Explorer</h1>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="intro">Introduction</button>
+            <button class="tab" data-tab="lab">Logic Lab</button>
+            <button class="tab" data-tab="analysis">Analysis Lab</button>
+        </div>
+
+        <!-- Introduction Tab Content -->
+        <div id="intro" class="tab-content active">
+            <div class="intro-container">
+                <p class="intro-text" style="margin-top: 1.5rem;">
+                    This tool helps you understand <strong>conditional statements</strong> (statements of the form "If P, then Q"). The key to these statements is the relationship between the "if" part (the <strong>hypothesis P</strong>) and the "then" part (the <strong>conclusion Q</strong>).
+                </p>
+                <div class="intro-venn">
+                    <svg viewBox="-1 -1 2 2" width="200" height="200" aria-labelledby="intro-title intro-desc">
+                        <title id="intro-title">Venn Diagram for a True "If P, then Q" statement</title>
+                        <desc id="intro-desc">An outer circle labeled Q contains a smaller inner circle labeled P. This shows that every time P occurs, Q must also occur.</desc>
+                        <circle cx="0" cy="0" r="0.62" fill="rgba(21,101,192,0.1)" stroke="#555" stroke-width="0.04"></circle>
+                        <text x="0" y="-0.7" fill="#333" font-size="0.15" font-weight="bold" text-anchor="middle">Q (Conclusion)</text>
+                        <circle cx="0" cy="0" r="0.4" fill="rgba(21,101,192,0.2)" stroke="#333" stroke-width="0.04"></circle>
+                        <text x="0" y="0.05" fill="#111" font-size="0.2" font-weight="bold" text-anchor="middle">P</text>
+                        <text x="0" y="0.25" fill="#111" font-size="0.1" text-anchor="middle">(Hypothesis)</text>
+                    </svg>
+                </div>
+                <p class="intro-text">
+                    A statement "If P, then Q" is <strong>true</strong> if whenever P is true, Q must also be true. Visually, this means the entire circle for P is inside the circle for Q. <br><br> A statement is <strong>false</strong> if you can find even one situation where P is true, but Q is false. This is called a <strong>counterexample</strong>. It would be a point inside circle P, but outside circle Q (which is impossible in the diagram above).
+                </p>
+                <p class="intro-text">
+                    Head over to the <strong>Logic Lab</strong> to generate problems and test your knowledge!
+                </p>
+            </div>
+        </div>
+
+        <!-- Logic Lab Tab Content -->
+        <div id="lab" class="tab-content">
+            <div class="lab-intro-box">
+                <p><strong>Welcome to the Logic Lab!</strong></p>
+                <ul>
+                    <li>Use the controls to generate a new logic problem with AI.</li>
+                    <li>Analyze the "Converse" statement that appears.</li>
+                    <li>If it's false, provide your own counterexample and have the AI check it!</li>
+                </ul>
+                <p class="ai-disclaimer">Please note: The AI helper can make mistakes and may be temporarily unavailable during periods of high traffic.</p>
+            </div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="categorySelect">1. Choose a Category</label>
+                    <select id="categorySelect">
+                        <option value="Numbers">Numbers</option>
+                        <option value="Geometry">Geometry</option>
+                        <option value="Number Theory">Number Theory</option>
+                        <option value="Calculus">Calculus</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="difficultySelect">2. Choose a Difficulty</label>
+                    <select id="difficultySelect">
+                        <option value="Foundation">Foundation</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="control-group generate-button-container">
+                    <button id="generateBtn">🤖 Generate a Problem with AI</button>
+                </div>
+            </div>
+
+            <div class="interactive-area">
+                <h2>Generated Problem</h2>
+                <div id="statement-display">
+                    <p>Select a category and difficulty, then click "Generate" to create a new problem.</p>
+                </div>
+                <div class="venn-container">
+                    <div id="venn-box" class="venn-box"></div>
+                    <div id="venn-tooltip"></div>
+                </div>
+                <div id="venn-legend" class="venn-legend" style="display: none;"></div>
+                <div id="analysis-box" class="feedback-box" style="display: none;">
+                    <!-- Step 1: Ask True/False -->
+                    <form id="truthCheckForm" class="form-section">
+                        <h3>Is the Converse ("If Q, then P") True or False?</h3>
+                        <p id="converse-statement"></p>
+                        <div class="truth-radios">
+                            <label><input type="radio" name="truth" value="true"> True</label>
+                            <label><input type="radio" name="truth" value="false"> False</label>
+                        </div>
+                        <button type="submit" class="control-group button">Check Answer</button>
+                    </form>
+                    <!-- Step 2: Ask for Counterexample -->
+                    <form id="counterexampleForm" class="form-section hidden">
+                        <h3>You're right, it's false!</h3>
+                        <p>Please provide a counterexample below.</p>
+                        <div class="control-group" style="width:100%;">
+                           <input type="text" id="counterexampleInput" placeholder="Enter your counterexample here" required>
+                        </div>
+                        <button type="submit" class="control-group button">Check Counterexample</button>
+                    </form>
+                    <!-- Step 3: Show Final Feedback -->
+                    <div id="info-card" class="hidden"></div>
+                     <!-- Step 4: Challenge AI -->
+                    <form id="challengeForm" class="form-section hidden">
+                        <h3>Challenge the AI's Assessment</h3>
+                        <p>If you believe the AI is incorrect, please explain your reasoning.</p>
+                         <div class="control-group" style="width:100%;">
+                           <textarea id="challengeInput" rows="3" placeholder="My reasoning is..." required></textarea>
+                        </div>
+                        <button type="submit" class="control-group button">Submit Challenge</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Lab Tab Content -->
+        <div id="analysis" class="tab-content">
+            <div class="lab-intro-box">
+                <p><strong>Welcome to the Analysis Lab!</strong></p>
+                <p>This section provides a complete logical breakdown of the problem you generated in the Logic Lab. Use it to check your understanding of converse, inverse, contrapositive, and necessary/sufficient conditions.</p>
+            </div>
+            <div id="analysis-statement-display">
+                <p>Generate a problem in the "Logic Lab" tab first to see the analysis here.</p>
+            </div>
+            <div id="analysis-grid" class="analysis-grid">
+                <!-- Cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+<script>
+    // --- STATE MANAGEMENT ---
+    let state = {
+        category: 'Numbers',
+        difficulty: 'Foundation',
+        currentProblem: null,
+        lastAIResponse: '', // Store AI reasoning for challenges
+        isLocked: false,
+    };
+
+    // --- DOM ELEMENTS ---
+    const categorySelect = document.getElementById('categorySelect');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const generateBtn = document.getElementById('generateBtn');
+    const statementDisplay = document.getElementById('statement-display');
+    const analysisStatementDisplay = document.getElementById('analysis-statement-display');
+    const vennBox = document.getElementById('venn-box');
+    const vennTooltip = document.getElementById('venn-tooltip');
+    const vennLegend = document.getElementById('venn-legend');
+    const analysisBox = document.getElementById('analysis-box');
+    const analysisGrid = document.getElementById('analysis-grid');
+    // Forms
+    const truthCheckForm = document.getElementById('truthCheckForm');
+    const counterexampleForm = document.getElementById('counterexampleForm');
+    const challengeForm = document.getElementById('challengeForm');
+    // Form Inputs/Display
+    const converseStatement = document.getElementById('converse-statement');
+    const counterexampleInput = document.getElementById('counterexampleInput');
+    const challengeInput = document.getElementById('challengeInput');
+    const infoCard = document.getElementById('info-card');
+
+    // --- TAB SWITCHING LOGIC ---
+    document.querySelector('.tabs').addEventListener('click', e => {
+        if (e.target.matches('.tab')) {
+            const tabId = e.target.dataset.tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab='${tabId}']`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (tabId === 'analysis' && state.currentProblem) {
+                displayAnalysis();
+            }
+        }
+    });
+
+    // --- AI & APP LOGIC ---
+    async function callAI(prompt) {
+        const apiKey = ""; // Handled by environment
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+        const result = await response.json();
+
+        if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const text = result.candidates[0].content.parts[0].text;
+            state.lastAIResponse = text; // Store the raw response for context
+            return text.replace(/```json/g, '').replace(/```/g, '').trim();
+        }
+        
+        console.error("Unexpected AI response:", result);
+        throw new Error("Could not get a valid response from the AI.");
+    }
+
+    async function generateProblem() {
+        generateBtn.disabled = true;
+        generateBtn.textContent = "🧠 Thinking...";
+        statementDisplay.innerHTML = `<p>Communicating with the AI... please wait.</p>`;
+        analysisStatementDisplay.innerHTML = `<p>Generating a new problem...</p>`;
+        analysisGrid.innerHTML = '';
+        
+        const prompt = `
+            You are a mathematics educator creating a logic problem.
+            Generate an 'If P, then Q' conditional statement about "${state.category}" with a difficulty of "${state.difficulty}".
+            RULES:
+            1. 'If P, then Q' must be logically true.
+            2. You must also generate the converse, inverse, and contrapositive statements.
+            3. For each of these three new statements, determine its truth value (true/false).
+            4. If a statement is false, provide a specific, concise counterexample.
+            5. Also provide the simple negations for P and Q.
+            6. Use LaTeX for all mathematical notation, like $...$ for inline math.
+            7. Return ONLY a single, valid JSON object.
+            
+            Example JSON structure:
+            {
+              "p": "a number is a multiple of $6$",
+              "q": "it is a multiple of $3$",
+              "not_p": "a number is not a multiple of $6$",
+              "not_q": "it is not a multiple of $3$",
+              "converse": { "statement": "If it is a multiple of $3$, then it is a multiple of $6$", "truth": false, "counterexample": "$9$" },
+              "inverse": { "statement": "If a number is not a multiple of $6$, then it is not a multiple of $3$", "truth": false, "counterexample": "$3$" },
+              "contrapositive": { "statement": "If it is not a multiple of $3$, then it is not a multiple of $6$", "truth": true, "counterexample": null }
+            }
+        `;
+        
+        try {
+            const jsonResponse = await callAI(prompt);
+            state.currentProblem = JSON.parse(jsonResponse);
+            resetInteractiveState();
+            displayProblem();
+        } catch (error) {
+            console.error("Failed to generate AI problem:", error);
+            statementDisplay.innerHTML = `<p style="color: var(--secondary-color);">Sorry, an error occurred. Please try again.</p>`;
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = "🤖 Generate a Problem with AI";
+        }
+    }
+    
+    function typesetMath(elements) {
+        if (window.MathJax && window.MathJax.startup?.promise) {
+            window.MathJax.startup.promise.then(() => {
+                window.MathJax.typesetPromise(elements).catch((err) => console.log('MathJax Typeset Error: ' + err.message));
+            });
+        }
+    }
+
+    function resetInteractiveState() {
+        state.isLocked = false;
+        analysisBox.style.display = 'none';
+        vennLegend.style.display = 'none';
+        [truthCheckForm, counterexampleForm, infoCard, challengeForm].forEach(el => el.classList.add('hidden'));
+        truthCheckForm.classList.remove('hidden');
+        truthCheckForm.reset();
+        counterexampleForm.reset();
+        challengeForm.reset();
+    }
+
+    function displayProblem() {
+        const { p, q } = state.currentProblem;
+        statementDisplay.innerHTML = `
+            <p><strong>If P, then Q:</strong> If ${p}, then ${q}.</p>
+            <p><em>(This statement is guaranteed to be true.)</em></p>
+        `;
+        buildInteractiveVenn(false);
+        converseStatement.innerHTML = state.currentProblem.converse.statement;
+        analysisBox.style.display = 'block';
+        typesetMath([statementDisplay, converseStatement]);
+    }
+    
+    // --- UI FLOW & EVENT HANDLERS ---
+    
+    function handleTruthCheckSubmit(e) {
+        e.preventDefault();
+        const userAnswer = truthCheckForm.truth.value === 'true';
+        const isCorrect = userAnswer === state.currentProblem.converse.truth;
+
+        handleVennClick(); // Lock the diagram
+        truthCheckForm.classList.add('hidden');
+
+        if (isCorrect) {
+            if (userAnswer === true) { // Correctly identified as TRUE
+                showResult('success', `<h3>Correct!</h3><p>The converse statement is indeed <strong>TRUE</strong>.</p>`);
+            } else { // Correctly identified as FALSE
+                counterexampleForm.classList.remove('hidden');
+            }
+        } else { // Incorrectly identified
+            const truthText = state.currentProblem.converse.truth ? "TRUE" : "FALSE";
+            let feedback = `<h3>Not Quite.</h3><p>The converse statement is actually <strong>${truthText}</strong>.</p>`;
+            if (!state.currentProblem.converse.truth) {
+                feedback += `<p>A counterexample is: <strong>${state.currentProblem.converse.counterexample}</strong>.</p>`;
+            }
+            showResult('error', feedback);
+        }
+    }
+
+    async function handleCounterexampleSubmit(e) {
+        e.preventDefault();
+        const userCounterexample = counterexampleInput.value;
+        counterexampleForm.classList.add('hidden');
+        showResult('loading', '<h3>Checking with AI...</h3>');
+
+        const { p, q } = state.currentProblem;
+        const prompt = `
+            A user is analyzing the statement: "If ${q}, then ${p}."
+            They claim "${userCounterexample}" is a counterexample.
+            A valid counterexample must make "${q}" true and "${p}" false.
+            
+            Your task is to respond briefly and naturally. Use LaTeX for any math notation.
+
+            - If the user's answer is a valid counterexample, start with "Yes, that works because..." and briefly explain why.
+            - If the user's answer is NOT valid, start with "Not quite..." and politely explain which condition it fails to meet.
+        `;
+
+        try {
+            const aiFeedback = await callAI(prompt);
+            const isCorrect = aiFeedback.toLowerCase().startsWith('yes');
+            showResult(isCorrect ? 'success' : 'error', `<h3>AI Feedback:</h3><p>${aiFeedback}</p>`);
+        } catch (error) {
+            console.error("AI check failed:", error);
+            showResult('error', `<h3>Error</h3><p>Could not verify the counterexample. Please try again.</p>`);
+        }
+    }
+
+    async function handleChallengeSubmit(e) {
+        e.preventDefault();
+        const userReasoning = challengeInput.value;
+        challengeForm.classList.add('hidden');
+        showResult('loading', '<h3>Re-evaluating with AI...</h3>');
+
+        const prompt = `
+            You are a humble math tutor AI. You previously made an assessment, and a user is challenging it.
+            Original Problem: If P, then Q is "If ${state.currentProblem.p}, then ${state.currentProblem.q}".
+            The statement being analyzed was the converse: "If ${state.currentProblem.q}, then ${state.currentProblem.p}".
+            Your previous analysis/response was: "${state.lastAIResponse}"
+            The user is challenging you with this reasoning: "${userReasoning}"
+
+            Task: Re-evaluate everything. Use LaTeX for any math notation.
+            - If the user is correct, you MUST admit your mistake and provide the corrected explanation.
+            - If the user is wrong, politely explain the flaw in their reasoning.
+        `;
+        
+        try {
+            const aiReevaluation = await callAI(prompt);
+            showResult('neutral', `<h3>AI Re-evaluation:</h3><p>${aiReevaluation}</p>`);
+        } catch (error) {
+            console.error("AI re-evaluation failed:", error);
+            showResult('error', `<h3>Error</h3><p>Could not process the challenge. Please try again.</p>`);
+        }
+    }
+
+    function showResult(type, htmlContent) {
+        infoCard.className = ''; // Reset classes
+        if (type === 'loading') {
+            infoCard.innerHTML = htmlContent;
+        } else if (type === 'neutral') {
+            infoCard.innerHTML = htmlContent;
+            infoCard.style.borderColor = 'var(--dark-gray)';
+            infoCard.style.backgroundColor = '#f0f0f0';
+        } else {
+            infoCard.classList.add(type); // 'success' or 'error'
+            infoCard.innerHTML = htmlContent;
+            const challengeBtn = document.createElement('button');
+            challengeBtn.className = 'control-group button challenge-btn';
+            challengeBtn.textContent = '🤔 Challenge AI\'s Assessment';
+            challengeBtn.onclick = () => {
+                challengeForm.classList.remove('hidden');
+                infoCard.classList.add('hidden');
+            };
+            infoCard.appendChild(challengeBtn);
+        }
+        infoCard.classList.remove('hidden');
+        typesetMath([infoCard]);
+    }
+
+    // --- INTERACTIVE VENN DIAGRAM ---
+    function buildInteractiveVenn(locked) {
+        vennBox.innerHTML = '';
+        vennBox.className = locked ? 'venn-box locked' : 'venn-box';
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('viewBox', '-1 -1 2 2');
+
+        const { p, q, converse } = state.currentProblem;
+        const converse_truth = converse.truth;
+        const RP = converse_truth ? 0.62 : 0.40, RQ = 0.62;
+
+        const defs = document.createElementNS(svgNS, "defs");
+        defs.innerHTML = `
+            <pattern id="failPattern" patternUnits='userSpaceOnUse' width='0.1' height='0.1'>
+                <path d='M-0.02,0.1 l0.12,-0.12 M-0.02,0.02 l0.04,-0.04 M0.06,0.12 l0.04,-0.04' stroke='rgba(183,28,28,0.6)' stroke-width='0.02'/>
+            </pattern>
+        `;
+        svg.appendChild(defs);
+
+        const qCircleBase = document.createElementNS(svgNS, "circle");
+        qCircleBase.setAttribute("cx", "0"); qCircleBase.setAttribute("cy", "0");
+        qCircleBase.setAttribute("r", RQ); qCircleBase.setAttribute("fill", "rgba(21,101,192,0.1)");
+        qCircleBase.setAttribute("stroke", "#555"); qCircleBase.setAttribute("stroke-width", "0.03");
+        svg.appendChild(qCircleBase);
+
+        let failRegionGroup = null;
+        if (!converse_truth) {
+            const maskId = "ringMask" + Date.now();
+            const mask = document.createElementNS(svgNS, "mask");
+            mask.setAttribute("id", maskId);
+            
+            const whiteCircle = document.createElementNS(svgNS, "circle");
+            whiteCircle.setAttribute("cx", "0"); whiteCircle.setAttribute("cy", "0");
+            whiteCircle.setAttribute("r", RQ); whiteCircle.setAttribute("fill", "white");
+            mask.appendChild(whiteCircle);
+            
+            const blackCircle = document.createElementNS(svgNS, "circle");
+            blackCircle.setAttribute("cx", "0"); blackCircle.setAttribute("cy", "0");
+            blackCircle.setAttribute("r", RP); blackCircle.setAttribute("fill", "black");
+            mask.appendChild(blackCircle);
+            
+            defs.appendChild(mask);
+
+            failRegionGroup = document.createElementNS(svgNS, "g");
+            failRegionGroup.classList.add("fail-region");
+            if (locked) failRegionGroup.classList.add("visible");
+
+            const stripedCircle = document.createElementNS(svgNS, "circle");
+            stripedCircle.setAttribute("cx", "0"); stripedCircle.setAttribute("cy", "0");
+            stripedCircle.setAttribute("r", RQ); stripedCircle.setAttribute("fill", "url(#failPattern)");
+            stripedCircle.setAttribute("mask", `url(#${maskId})`);
+            failRegionGroup.appendChild(stripedCircle);
+            svg.appendChild(failRegionGroup);
+        }
+        
+        const pCircleBase = document.createElementNS(svgNS, "circle");
+        pCircleBase.setAttribute("cx", "0"); pCircleBase.setAttribute("cy", "0");
+        pCircleBase.setAttribute("r", RP); pCircleBase.setAttribute("fill", "rgba(21,101,192,0.2)");
+        pCircleBase.setAttribute("stroke", "#333"); pCircleBase.setAttribute("stroke-width", "0.03");
+        svg.appendChild(pCircleBase);
+        
+        const qLabel = document.createElementNS(svgNS, "text");
+        qLabel.setAttribute("x", "0"); qLabel.setAttribute("y", "-0.7");
+        qLabel.setAttribute("fill", "#333"); qLabel.setAttribute("font-size", "0.25");
+        qLabel.setAttribute("font-weight", "bold"); qLabel.setAttribute("text-anchor", "middle");
+        qLabel.textContent = "Q";
+        svg.appendChild(qLabel);
+
+        const pLabel = document.createElementNS(svgNS, "text");
+        pLabel.setAttribute("x", "0"); pLabel.setAttribute("y", "0.08");
+        pLabel.setAttribute("fill", "#111");
+        pLabel.setAttribute("font-size", "0.3");
+        pLabel.setAttribute("font-weight", "bold");
+        pLabel.setAttribute("text-anchor", "middle");
+        pLabel.textContent = "P";
+        svg.appendChild(pLabel);
+
+        if (!converse_truth && !locked && failRegionGroup) {
+            const clickArea = document.createElementNS(svgNS, "rect");
+            clickArea.setAttribute('x', -1); clickArea.setAttribute('y', -1);
+            clickArea.setAttribute('width', 2); clickArea.setAttribute('height', 2);
+            clickArea.setAttribute('fill', 'transparent'); clickArea.style.cursor = 'pointer';
+
+            clickArea.addEventListener('mousemove', (e) => {
+                const rect = svg.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+                const r = Math.sqrt(x * x + y * y);
+                
+                if (r > RP && r <= RQ) {
+                    failRegionGroup.classList.add('visible');
+                    vennTooltip.classList.add('visible');
+                } else {
+                    failRegionGroup.classList.remove('visible');
+                    vennTooltip.classList.remove('visible');
+                }
+            });
+            
+            clickArea.addEventListener('mouseleave', () => {
+                if (!locked) {
+                    failRegionGroup.classList.remove('visible');
+                    vennTooltip.classList.remove('visible');
+                }
+            });
+
+            clickArea.addEventListener('click', (e) => {
+                const rect = svg.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+                const r = Math.sqrt(x * x + y * y);
+                if (r > RP && r <= RQ) handleVennClick();
+            });
+            svg.appendChild(clickArea);
+        }
+        
+        vennBox.appendChild(svg);
+        
+        vennLegend.style.display = 'block';
+        vennLegend.innerHTML = `
+            <div class="legend-item">
+                <div class="legend-key p-key">P</div>
+                <div><strong>Hypothesis (P):</strong> ${p}</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-key q-key">Q</div>
+                <div><strong>Conclusion (Q):</strong> ${q}</div>
+            </div>
+        `;
+        typesetMath([vennLegend]);
+        
+        vennTooltip.textContent = `Counterexample region for "If Q, then P": Q is true, but P is false.`;
+    }
+
+    function handleVennClick() {
+        if (state.isLocked) return;
+        state.isLocked = true;
+        buildInteractiveVenn(true);
+    }
+    
+    // --- ANALYSIS TAB LOGIC ---
+    function displayAnalysis() {
+        if (!state.currentProblem) return;
+        
+        const { p, q, converse, inverse, contrapositive } = state.currentProblem;
+
+        analysisStatementDisplay.innerHTML = `
+            <p><strong>Original Statement:</strong> If ${p}, then ${q}.</p>
+        `;
+        
+        let conditionsHTML = `
+            <p><strong>Sufficient:</strong> Knowing that "${p}" is true is <strong>sufficient</strong> to conclude that "${q}" is true.</p>
+            <p><strong>Necessary:</strong> For "${p}" to be true, it is <strong>necessary</strong> that "${q}" is also true.</p>
+        `;
+
+        if (converse.truth) {
+            conditionsHTML += `
+                <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--medium-gray);">
+                <p><strong>Biconditional:</strong> Because the converse is also true, the conditions are equivalent. P is <strong>necessary and sufficient</strong> for Q (and vice-versa).</p>
+            `;
+        }
+
+        analysisGrid.innerHTML = `
+            <div class="analysis-card">
+                <h4>Converse <span class="truth-badge ${converse.truth}">${converse.truth ? 'TRUE' : 'FALSE'}</span></h4>
+                <p class="form">If Q, then P</p>
+                <div class="analysis-text">
+                    <p>${converse.statement}</p>
+                    ${!converse.truth ? `<p><strong>Counterexample:</strong> ${converse.counterexample}</p>` : ''}
+                </div>
+            </div>
+            <div class="analysis-card">
+                <h4>Inverse <span class="truth-badge ${inverse.truth}">${inverse.truth ? 'TRUE' : 'FALSE'}</span></h4>
+                <p class="form">If not P, then not Q</p>
+                <div class="analysis-text">
+                    <p>${inverse.statement}</p>
+                    ${!inverse.truth ? `<p><strong>Counterexample:</strong> ${inverse.counterexample}</p>` : ''}
+                </div>
+            </div>
+            <div class="analysis-card">
+                <h4>Contrapositive <span class="truth-badge ${contrapositive.truth}">${contrapositive.truth ? 'TRUE' : 'FALSE'}</span></h4>
+                <p class="form">If not Q, then not P</p>
+                <div class="analysis-text">
+                    <p>${contrapositive.statement}</p>
+                    <p><em>This is always logically equivalent to the original statement.</em></p>
+                </div>
+            </div>
+            <div class="analysis-card">
+                <h4>Conditions</h4>
+                <div class="analysis-text">
+                    ${conditionsHTML}
+                </div>
+            </div>
+        `;
+        
+        typesetMath([analysisStatementDisplay, analysisGrid]);
+    }
+
+
+    // --- EVENT LISTENERS ---
+    categorySelect.addEventListener('change', (e) => state.category = e.target.value);
+    difficultySelect.addEventListener('change', (e) => state.difficulty = e.target.value);
+    generateBtn.addEventListener('click', generateProblem);
+    truthCheckForm.addEventListener('submit', handleTruthCheckSubmit);
+    counterexampleForm.addEventListener('submit', handleCounterexampleSubmit);
+    challengeForm.addEventListener('submit', handleChallengeSubmit);
+
+</script>
+</body>
+</html>
